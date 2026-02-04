@@ -118,7 +118,7 @@ class TwitterScraper:
                     replies=tweet.reply_count or 0,
                     url=f"https://x.com/{username}/status/{tweet.id}",
                     is_retweet=hasattr(tweet, 'retweeted_tweet') and tweet.retweeted_tweet is not None,
-                    is_reply=tweet.in_reply_to_status_id is not None
+                    is_reply=tweet.in_reply_to is not None
                 )
                 tweets.append(tweet_obj)
 
