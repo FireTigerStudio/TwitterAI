@@ -1,0 +1,54 @@
+name: Twitter Scraper
+
+on:
+  schedule:
+    # 08:00 Beijing time (00:00 UTC) and 20:00 Beijing time (12:00 UTC)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write cookie file from secret
+        env:
+          TWITTER_COOKIES: ${{ secrets.TWITTER_COOKIES }}
+        run: echo "$TWITTER_COOKIES" > .twitter_cookies.json
+
+      - name: Run scraper
+        working-directory: scripts
+        run: python scraper.py
+
+      - name: Generate AI summaries
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        working-directory: scripts
+        run: python ai_summary.py --input ../data/$(date +%Y-%m-%d).json
+
+      - name: Export to Excel
+        working-directory: scripts
+        run: python excel_export.py --input ../data/$(date +%Y-%m-%d).json
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/*.json output/*.xlsx
+          git diff --quiet && git diff --staged --quiet || (
+            git commit -m "Daily scrape: $(date +'%Y-%m-%d %H:%M') UTC" &&
+            git push
+          )

@@ -1,0 +1,52 @@
+[
+  {
+    "username": "elonmusk",
+    "display_name": "Elon Musk",
+    "category": "tech"
+  },
+  {
+    "username": "OpenAI",
+    "display_name": "OpenAI",
+    "category": "ai"
+  },
+  {
+    "username": "sama",
+    "display_name": "Sam Altman",
+    "category": "ai"
+  },
+  {
+    "username": "VitalikButerin",
+    "display_name": "Vitalik Buterin",
+    "category": "web3"
+  },
+  {
+    "username": "AndrewYNg",
+    "display_name": "Andrew Ng",
+    "category": "ai"
+  },
+  {
+    "username": "karpathy",
+    "display_name": "Andrej Karpathy",
+    "category": "ai"
+  },
+  {
+    "username": "ylecun",
+    "display_name": "Yann LeCun",
+    "category": "ai"
+  },
+  {
+    "username": "demishassabis",
+    "display_name": "Demis Hassabis",
+    "category": "ai"
+  },
+  {
+    "username": "naval",
+    "display_name": "Naval",
+    "category": "tech"
+  },
+  {
+    "username": "balajis",
+    "display_name": "Balaji Srinivasan",
+    "category": "web3"
+  }
+]

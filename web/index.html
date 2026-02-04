@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TwitterAI - 每日推文摘要</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container">
+      <h1 class="header__title">TwitterAI</h1>
+      <p class="header__subtitle">AI / 科技 / Web3 领域推文自动监测与 AI 摘要</p>
+    </div>
+  </header>
+
+  <section class="stats" id="stats" style="display: none;">
+    <div class="container stats__row">
+      <div class="stats__item">
+        <span class="stats__number" id="stat-accounts">0</span>
+        <span class="stats__label">监控账号</span>
+      </div>
+      <div class="stats__item">
+        <span class="stats__number" id="stat-tweets">0</span>
+        <span class="stats__label">抓取推文</span>
+      </div>
+      <div class="stats__item">
+        <span class="stats__number" id="stat-time">--</span>
+        <span class="stats__label">更新时间</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="container controls__row">
+      <div class="controls__date">
+        <label for="date-picker" class="controls__label">选择日期</label>
+        <input type="date" id="date-picker" class="controls__input">
+      </div>
+      <button id="download-btn" class="btn btn--primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn__icon">
+          <path d="M8 1v10M8 11L4 7M8 11l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        下载 Excel 报表
+      </button>
+    </div>
+  </section>
+
+  <div id="loading" class="loading" style="display: none;">
+    <div class="loading__spinner"></div>
+    <p class="loading__text">正在加载数据...</p>
+  </div>
+
+  <div id="error" class="message message--error" style="display: none;">
+    <p id="error-message"></p>
+  </div>
+
+  <div id="empty" class="message message--empty" style="display: none;">
+    <p>该日期暂无数据</p>
+    <p class="message__hint">请选择其他日期或等待下一次自动抓取</p>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div id="accounts-grid" class="grid"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__text">Powered by Twikit + Gemini AI &middot; Hosted on GitHub Pages</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
