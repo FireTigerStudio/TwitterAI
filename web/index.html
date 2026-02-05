@@ -38,12 +38,20 @@
         <label for="date-picker" class="controls__label">选择日期</label>
         <input type="date" id="date-picker" class="controls__input">
       </div>
-      <button id="download-btn" class="btn btn--primary">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn__icon">
-          <path d="M8 1v10M8 11L4 7M8 11l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        下载 Excel 报表
-      </button>
+      <div class="controls__actions">
+        <button id="manage-btn" class="btn btn--outline">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn__icon">
+            <path d="M8 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM8 6.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM8 11a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill="currentColor"/>
+          </svg>
+          管理账号
+        </button>
+        <button id="download-btn" class="btn btn--primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn__icon">
+            <path d="M8 1v10M8 11L4 7M8 11l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          下载 Excel 报表
+        </button>
+      </div>
     </div>
   </section>
 
@@ -72,6 +80,76 @@
       <p class="footer__text">Powered by Twikit + Gemini AI &middot; Hosted on GitHub Pages</p>
     </div>
   </footer>
+
+  <!-- Account Management Panel -->
+  <div id="panel-overlay" class="panel-overlay" style="display:none;"></div>
+  <aside id="manage-panel" class="panel" aria-label="管理账号">
+    <div class="panel__header">
+      <h2 class="panel__title">管理账号</h2>
+      <button id="panel-close" class="panel__close" aria-label="关闭">&times;</button>
+    </div>
+
+    <div class="panel__body">
+      <!-- GitHub Token -->
+      <div class="panel-section">
+        <button id="token-toggle" class="panel-section__toggle">
+          <span>GitHub 连接</span>
+          <span id="token-status" class="token-status token-status--disconnected">未连接</span>
+        </button>
+        <div id="token-form" class="panel-section__content" style="display:none;">
+          <p class="panel-hint">需要 GitHub Token 来保存变更（仅需配置一次）。<br>在 GitHub Settings → Developer settings → Personal access tokens 创建，勾选 repo 权限。</p>
+          <div class="panel-field">
+            <input type="password" id="github-token" class="panel-input" placeholder="ghp_xxxxxxxxxxxx">
+            <button id="token-save" class="btn btn--small btn--primary">保存</button>
+          </div>
+          <div id="repo-field" class="panel-field" style="display:none;">
+            <input type="text" id="github-repo" class="panel-input" placeholder="owner/repo (如: user/TwitterAI)">
+          </div>
+          <p id="repo-detected" class="panel-hint" style="display:none;"></p>
+        </div>
+      </div>
+
+      <!-- Add Account -->
+      <div class="panel-section">
+        <h3 class="panel-section__title">添加账号</h3>
+        <div class="panel-field">
+          <input type="text" id="add-url" class="panel-input" placeholder="粘贴 Twitter/X 链接，如 https://x.com/elonmusk">
+        </div>
+        <div id="add-preview" class="add-preview" style="display:none;">
+          <div class="panel-field">
+            <label class="panel-label">用户名</label>
+            <input type="text" id="add-username" class="panel-input" readonly>
+          </div>
+          <div class="panel-field">
+            <label class="panel-label">显示名称</label>
+            <input type="text" id="add-display-name" class="panel-input" placeholder="显示名称">
+          </div>
+          <div class="panel-field">
+            <label class="panel-label">分类</label>
+            <select id="add-category" class="panel-input">
+              <option value="ai">AI</option>
+              <option value="tech">Tech</option>
+              <option value="web3">Web3</option>
+            </select>
+          </div>
+          <button id="add-confirm" class="btn btn--primary btn--small btn--full">添加账号</button>
+        </div>
+        <p id="add-error" class="panel-error" style="display:none;"></p>
+      </div>
+
+      <!-- Account List -->
+      <div class="panel-section">
+        <h3 class="panel-section__title">已监控账号 (<span id="account-count">0</span>)</h3>
+        <ul id="account-list" class="account-list"></ul>
+        <p id="account-list-empty" class="panel-hint" style="display:none;">暂无监控账号</p>
+      </div>
+    </div>
+
+    <div id="panel-saving" class="panel-saving" style="display:none;">
+      <div class="loading__spinner"></div>
+      <span>保存中...</span>
+    </div>
+  </aside>
 
   <script src="app.js"></script>
 </body>

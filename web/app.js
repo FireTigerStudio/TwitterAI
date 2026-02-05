@@ -6,7 +6,13 @@ const state = {
   currentDate: null,
   data: null,
   loading: false,
-  error: null
+  error: null,
+  accounts: [],
+  accountsSha: null,
+  panelOpen: false,
+  editingIndex: null,
+  deletingIndex: null,
+  saving: false
 };
 
 // ---- Initialization ----
@@ -32,6 +38,19 @@ function setupEventListeners() {
   });
 
   document.getElementById('download-btn').addEventListener('click', downloadExcel);
+
+  // Panel controls
+  document.getElementById('manage-btn').addEventListener('click', openPanel);
+  document.getElementById('panel-close').addEventListener('click', closePanel);
+  document.getElementById('panel-overlay').addEventListener('click', closePanel);
+
+  // Token management
+  document.getElementById('token-toggle').addEventListener('click', toggleTokenForm);
+  document.getElementById('token-save').addEventListener('click', saveToken);
+
+  // Add account
+  document.getElementById('add-url').addEventListener('input', onAddUrlInput);
+  document.getElementById('add-confirm').addEventListener('click', addAccount);
 }
 
 // ---- Data Loading ----
@@ -258,5 +277,454 @@ function formatDate(isoString) {
     });
   } catch {
     return isoString;
+  }
+}
+
+// ============================================
+//  Account Management Panel
+// ============================================
+
+// ---- Panel Open/Close ----
+
+function openPanel() {
+  const overlay = document.getElementById('panel-overlay');
+  const panel = document.getElementById('manage-panel');
+  overlay.style.display = '';
+  requestAnimationFrame(() => {
+    overlay.classList.add('panel-overlay--visible');
+    panel.classList.add('panel--open');
+  });
+  state.panelOpen = true;
+  updateTokenStatus();
+  loadAccountsForPanel();
+}
+
+function closePanel() {
+  const overlay = document.getElementById('panel-overlay');
+  const panel = document.getElementById('manage-panel');
+  overlay.classList.remove('panel-overlay--visible');
+  panel.classList.remove('panel--open');
+  setTimeout(() => { overlay.style.display = 'none'; }, 300);
+  state.panelOpen = false;
+  state.editingIndex = null;
+  state.deletingIndex = null;
+  clearAddForm();
+}
+
+// ---- GitHub Token ----
+
+function toggleTokenForm() {
+  const form = document.getElementById('token-form');
+  form.style.display = form.style.display === 'none' ? '' : 'none';
+  if (form.style.display !== 'none') {
+    const saved = localStorage.getItem('github_token');
+    const repo = localStorage.getItem('github_repo');
+    if (saved) document.getElementById('github-token').value = saved;
+
+    // Auto-detect repo from GitHub Pages URL
+    const autoRepo = detectRepoFromUrl();
+    const repoField = document.getElementById('repo-field');
+    const repoDetected = document.getElementById('repo-detected');
+
+    if (autoRepo) {
+      // On GitHub Pages: hide manual input, show detected repo
+      repoField.style.display = 'none';
+      repoDetected.textContent = `仓库: ${autoRepo}（自动检测）`;
+      repoDetected.style.display = '';
+    } else {
+      // Local dev: show manual input
+      repoField.style.display = '';
+      repoDetected.style.display = 'none';
+      if (repo) document.getElementById('github-repo').value = repo;
+    }
+  }
+}
+
+function detectRepoFromUrl() {
+  const host = window.location.hostname;
+  const path = window.location.pathname;
+  if (host.endsWith('.github.io')) {
+    const owner = host.replace('.github.io', '');
+    const repoName = path.split('/').filter(Boolean)[0] || '';
+    if (repoName) return `${owner}/${repoName}`;
+  }
+  return null;
+}
+
+function saveToken() {
+  const token = document.getElementById('github-token').value.trim();
+  const autoRepo = detectRepoFromUrl();
+  const manualRepo = document.getElementById('github-repo').value.trim();
+  const repo = autoRepo || manualRepo;
+
+  if (!token) {
+    showAddError('请输入 GitHub Token');
+    return;
+  }
+  if (!repo) {
+    showAddError('请输入仓库地址 (如: yourusername/TwitterAI)');
+    return;
+  }
+  localStorage.setItem('github_token', token);
+  localStorage.setItem('github_repo', repo);
+  hideAddError();
+  updateTokenStatus();
+  document.getElementById('token-form').style.display = 'none';
+  loadAccountsForPanel();
+}
+
+function updateTokenStatus() {
+  const el = document.getElementById('token-status');
+  const token = localStorage.getItem('github_token');
+  const repo = localStorage.getItem('github_repo');
+  if (token && repo) {
+    el.textContent = '已连接';
+    el.className = 'token-status token-status--connected';
+  } else if (token && !repo) {
+    el.textContent = '缺少仓库';
+    el.className = 'token-status token-status--disconnected';
+  } else {
+    el.textContent = '未连接';
+    el.className = 'token-status token-status--disconnected';
+  }
+}
+
+function getGitHubConfig() {
+  const token = localStorage.getItem('github_token');
+  const repo = localStorage.getItem('github_repo') || detectRepoFromUrl();
+  return { token, repo };
+}
+
+// ---- Load Accounts from GitHub ----
+
+async function loadAccountsForPanel() {
+  const { token, repo } = getGitHubConfig();
+  if (!token || !repo) {
+    // Fallback: try loading from local accounts.json
+    try {
+      const basePath = getBasePath();
+      const res = await fetch(`${basePath}accounts.json`);
+      if (res.ok) {
+        state.accounts = await res.json();
+        state.accountsSha = null;
+        renderAccountList();
+      }
+    } catch { /* ignore */ }
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/accounts.json`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+    const data = await res.json();
+    state.accountsSha = data.sha;
+    state.accounts = JSON.parse(atob(data.content));
+    renderAccountList();
+  } catch (err) {
+    console.error('Failed to load accounts from GitHub:', err);
+    // Fallback to local
+    try {
+      const basePath = getBasePath();
+      const res = await fetch(`${basePath}accounts.json`);
+      if (res.ok) {
+        state.accounts = await res.json();
+        state.accountsSha = null;
+        renderAccountList();
+      }
+    } catch { /* ignore */ }
+  }
+}
+
+// ---- Save Accounts to GitHub ----
+
+async function saveAccountsToGitHub() {
+  const { token, repo } = getGitHubConfig();
+  if (!token) {
+    showAddError('请先在「GitHub 连接」中配置 Token');
+    return false;
+  }
+  if (!repo) {
+    showAddError('请先在「GitHub 连接」中配置仓库地址 (owner/repo)');
+    return false;
+  }
+
+  state.saving = true;
+  document.getElementById('panel-saving').style.display = 'flex';
+
+  try {
+    // Re-fetch SHA to avoid conflicts
+    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/accounts.json`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    let sha = state.accountsSha;
+    if (getRes.ok) {
+      const current = await getRes.json();
+      sha = current.sha;
+    }
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(state.accounts, null, 2) + '\n')));
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/accounts.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'feat: update accounts via dashboard',
+        content: content,
+        sha: sha
+      })
+    });
+
+    if (!putRes.ok) {
+      const errData = await putRes.json().catch(() => ({}));
+      throw new Error(errData.message || `GitHub API error: ${putRes.status}`);
+    }
+
+    const result = await putRes.json();
+    state.accountsSha = result.content.sha;
+    return true;
+
+  } catch (err) {
+    console.error('Failed to save accounts:', err);
+    showAddError(`保存失败: ${err.message}`);
+    return false;
+  } finally {
+    state.saving = false;
+    document.getElementById('panel-saving').style.display = 'none';
+  }
+}
+
+// ---- URL Parsing ----
+
+const TWITTER_URL_REGEX = /https?:\/\/(twitter\.com|x\.com)\/([A-Za-z0-9_]{1,15})\/?(\?.*)?$/;
+
+function parseTwitterUrl(input) {
+  const trimmed = input.trim();
+  const match = trimmed.match(TWITTER_URL_REGEX);
+  if (match) return match[2];
+  // Also accept bare username like @elonmusk or elonmusk
+  const bare = trimmed.replace(/^@/, '');
+  if (/^[A-Za-z0-9_]{1,15}$/.test(bare)) return bare;
+  return null;
+}
+
+function onAddUrlInput() {
+  const input = document.getElementById('add-url').value;
+  const username = parseTwitterUrl(input);
+  const preview = document.getElementById('add-preview');
+  hideAddError();
+
+  if (username) {
+    document.getElementById('add-username').value = '@' + username;
+    document.getElementById('add-display-name').value = '';
+    document.getElementById('add-category').value = 'ai';
+    preview.style.display = '';
+    document.getElementById('add-display-name').focus();
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function clearAddForm() {
+  document.getElementById('add-url').value = '';
+  document.getElementById('add-preview').style.display = 'none';
+  hideAddError();
+}
+
+function showAddError(msg) {
+  const el = document.getElementById('add-error');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+function hideAddError() {
+  document.getElementById('add-error').style.display = 'none';
+}
+
+// ---- Add Account ----
+
+async function addAccount() {
+  if (state.saving) return;
+  hideAddError();
+
+  const username = document.getElementById('add-username').value.replace('@', '').trim();
+  const displayName = document.getElementById('add-display-name').value.trim() || username;
+  const category = document.getElementById('add-category').value;
+
+  if (!username) {
+    showAddError('用户名不能为空');
+    return;
+  }
+
+  if (state.accounts.some(a => a.username.toLowerCase() === username.toLowerCase())) {
+    showAddError('该账号已在监控列表中');
+    return;
+  }
+
+  state.accounts.push({ username, display_name: displayName, category });
+
+  const saved = await saveAccountsToGitHub();
+  if (saved) {
+    clearAddForm();
+    renderAccountList();
+  } else {
+    // Rollback
+    state.accounts.pop();
+  }
+}
+
+// ---- Render Account List ----
+
+function renderAccountList() {
+  const list = document.getElementById('account-list');
+  const empty = document.getElementById('account-list-empty');
+  const count = document.getElementById('account-count');
+
+  count.textContent = state.accounts.length;
+  list.innerHTML = '';
+
+  if (state.accounts.length === 0) {
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  state.accounts.forEach((account, index) => {
+    const li = document.createElement('li');
+
+    if (state.editingIndex === index) {
+      li.className = 'account-item account-item--editing';
+      li.innerHTML = `
+        <div class="account-item__info">
+          <div class="account-item__name">@${escapeHtml(account.username)}</div>
+        </div>
+        <div class="account-edit-fields">
+          <div class="panel-field">
+            <label class="panel-label">显示名称</label>
+            <input type="text" class="panel-input edit-display-name" value="${escapeHtml(account.display_name)}">
+          </div>
+          <div class="panel-field">
+            <label class="panel-label">分类</label>
+            <select class="panel-input edit-category">
+              <option value="ai" ${account.category === 'ai' ? 'selected' : ''}>AI</option>
+              <option value="tech" ${account.category === 'tech' ? 'selected' : ''}>Tech</option>
+              <option value="web3" ${account.category === 'web3' ? 'selected' : ''}>Web3</option>
+            </select>
+          </div>
+          <div class="account-edit-actions">
+            <button class="btn btn--small btn--ghost edit-cancel">取消</button>
+            <button class="btn btn--small btn--primary edit-save">保存</button>
+          </div>
+        </div>
+      `;
+      li.querySelector('.edit-cancel').addEventListener('click', () => {
+        state.editingIndex = null;
+        renderAccountList();
+      });
+      li.querySelector('.edit-save').addEventListener('click', () => saveEdit(index, li));
+
+    } else if (state.deletingIndex === index) {
+      li.className = 'account-item account-item--editing';
+      li.innerHTML = `
+        <div class="account-item__info">
+          <div class="account-item__name">${escapeHtml(account.display_name)}</div>
+          <div class="account-item__username">@${escapeHtml(account.username)}</div>
+        </div>
+        <div class="delete-confirm">
+          <span class="delete-confirm__text">确认删除?</span>
+          <button class="btn btn--small btn--ghost delete-no">取消</button>
+          <button class="btn btn--small btn--danger delete-yes">删除</button>
+        </div>
+      `;
+      li.querySelector('.delete-no').addEventListener('click', () => {
+        state.deletingIndex = null;
+        renderAccountList();
+      });
+      li.querySelector('.delete-yes').addEventListener('click', () => confirmDelete(index));
+
+    } else {
+      li.className = 'account-item';
+      const categoryLabels = { ai: 'AI', tech: 'Tech', web3: 'Web3' };
+      li.innerHTML = `
+        <div class="account-item__info">
+          <div class="account-item__name">${escapeHtml(account.display_name)}</div>
+          <div class="account-item__username">@${escapeHtml(account.username)}</div>
+        </div>
+        <span class="account-item__badge">${escapeHtml(categoryLabels[account.category] || account.category)}</span>
+        <div class="account-item__actions">
+          <button class="account-item__btn edit-btn" title="编辑" aria-label="编辑">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="account-item__btn account-item__btn--delete delete-btn" title="删除" aria-label="删除">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M5 4v9a1 1 0 001 1h4a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      `;
+      li.querySelector('.edit-btn').addEventListener('click', () => {
+        state.editingIndex = index;
+        state.deletingIndex = null;
+        renderAccountList();
+      });
+      li.querySelector('.delete-btn').addEventListener('click', () => {
+        state.deletingIndex = index;
+        state.editingIndex = null;
+        renderAccountList();
+      });
+    }
+
+    list.appendChild(li);
+  });
+}
+
+// ---- Edit Account ----
+
+async function saveEdit(index, li) {
+  if (state.saving) return;
+  const newName = li.querySelector('.edit-display-name').value.trim();
+  const newCategory = li.querySelector('.edit-category').value;
+
+  if (!newName) return;
+
+  const oldAccount = { ...state.accounts[index] };
+  state.accounts[index].display_name = newName;
+  state.accounts[index].category = newCategory;
+
+  const saved = await saveAccountsToGitHub();
+  if (saved) {
+    state.editingIndex = null;
+    renderAccountList();
+  } else {
+    // Rollback
+    state.accounts[index] = oldAccount;
+  }
+}
+
+// ---- Delete Account ----
+
+async function confirmDelete(index) {
+  if (state.saving) return;
+
+  const removed = state.accounts.splice(index, 1)[0];
+
+  const saved = await saveAccountsToGitHub();
+  if (saved) {
+    state.deletingIndex = null;
+    renderAccountList();
+  } else {
+    // Rollback
+    state.accounts.splice(index, 0, removed);
+    state.deletingIndex = null;
+    renderAccountList();
   }
 }
