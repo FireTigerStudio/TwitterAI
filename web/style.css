@@ -531,6 +531,17 @@ body {
   cursor: pointer;
 }
 
+.panel-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-section__header .panel-section__title {
+  margin-bottom: 0;
+}
+
 .panel-section__title {
   font-size: var(--font-size-meta);
   font-weight: 600;
@@ -540,6 +551,15 @@ body {
 
 .panel-section__content {
   margin-top: 12px;
+}
+
+/* ---- Add Section (inline) ---- */
+.add-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--color-border);
 }
 
 /* ---- Token Status ---- */

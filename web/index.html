@@ -90,14 +90,55 @@
     </div>
 
     <div class="panel__body">
-      <!-- GitHub Token -->
+      <!-- Account List -->
+      <div class="panel-section">
+        <div class="panel-section__header">
+          <h3 class="panel-section__title">已监控账号 (<span id="account-count">0</span>)</h3>
+          <button id="add-toggle" class="btn btn--primary btn--small">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="btn__icon"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            添加账号
+          </button>
+        </div>
+
+        <!-- Add Account (inline, toggled) -->
+        <div id="add-section" class="add-section" style="display:none;">
+          <div class="panel-field">
+            <input type="text" id="add-url" class="panel-input" placeholder="粘贴 Twitter/X 链接，如 https://x.com/elonmusk">
+          </div>
+          <div id="add-preview" class="add-preview" style="display:none;">
+            <div class="panel-field">
+              <label class="panel-label">用户名</label>
+              <input type="text" id="add-username" class="panel-input" readonly>
+            </div>
+            <div class="panel-field">
+              <label class="panel-label">显示名称</label>
+              <input type="text" id="add-display-name" class="panel-input" placeholder="显示名称">
+            </div>
+            <div class="panel-field">
+              <label class="panel-label">分类</label>
+              <select id="add-category" class="panel-input">
+                <option value="ai">AI</option>
+                <option value="tech">Tech</option>
+                <option value="web3">Web3</option>
+              </select>
+            </div>
+            <button id="add-confirm" class="btn btn--primary btn--small btn--full">确认添加</button>
+          </div>
+          <p id="add-error" class="panel-error" style="display:none;"></p>
+        </div>
+
+        <ul id="account-list" class="account-list"></ul>
+        <p id="account-list-empty" class="panel-hint" style="display:none;">暂无监控账号</p>
+      </div>
+
+      <!-- GitHub Token (at bottom, collapsible) -->
       <div class="panel-section">
         <button id="token-toggle" class="panel-section__toggle">
           <span>GitHub 连接</span>
           <span id="token-status" class="token-status token-status--disconnected">未连接</span>
         </button>
         <div id="token-form" class="panel-section__content" style="display:none;">
-          <p class="panel-hint">需要 GitHub Token 来保存变更（仅需配置一次）。<br>在 GitHub Settings → Developer settings → Personal access tokens 创建，勾选 repo 权限。</p>
+          <p class="panel-hint">需要 GitHub Token 来保存变更（仅需配置一次）。<br>在 GitHub Settings &rarr; Developer settings &rarr; Personal access tokens 创建，勾选 repo 权限。</p>
           <div class="panel-field">
             <input type="password" id="github-token" class="panel-input" placeholder="ghp_xxxxxxxxxxxx">
             <button id="token-save" class="btn btn--small btn--primary">保存</button>
@@ -107,41 +148,6 @@
           </div>
           <p id="repo-detected" class="panel-hint" style="display:none;"></p>
         </div>
-      </div>
-
-      <!-- Add Account -->
-      <div class="panel-section">
-        <h3 class="panel-section__title">添加账号</h3>
-        <div class="panel-field">
-          <input type="text" id="add-url" class="panel-input" placeholder="粘贴 Twitter/X 链接，如 https://x.com/elonmusk">
-        </div>
-        <div id="add-preview" class="add-preview" style="display:none;">
-          <div class="panel-field">
-            <label class="panel-label">用户名</label>
-            <input type="text" id="add-username" class="panel-input" readonly>
-          </div>
-          <div class="panel-field">
-            <label class="panel-label">显示名称</label>
-            <input type="text" id="add-display-name" class="panel-input" placeholder="显示名称">
-          </div>
-          <div class="panel-field">
-            <label class="panel-label">分类</label>
-            <select id="add-category" class="panel-input">
-              <option value="ai">AI</option>
-              <option value="tech">Tech</option>
-              <option value="web3">Web3</option>
-            </select>
-          </div>
-          <button id="add-confirm" class="btn btn--primary btn--small btn--full">添加账号</button>
-        </div>
-        <p id="add-error" class="panel-error" style="display:none;"></p>
-      </div>
-
-      <!-- Account List -->
-      <div class="panel-section">
-        <h3 class="panel-section__title">已监控账号 (<span id="account-count">0</span>)</h3>
-        <ul id="account-list" class="account-list"></ul>
-        <p id="account-list-empty" class="panel-hint" style="display:none;">暂无监控账号</p>
       </div>
     </div>
 

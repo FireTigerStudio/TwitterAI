@@ -49,6 +49,7 @@ function setupEventListeners() {
   document.getElementById('token-save').addEventListener('click', saveToken);
 
   // Add account
+  document.getElementById('add-toggle').addEventListener('click', toggleAddSection);
   document.getElementById('add-url').addEventListener('input', onAddUrlInput);
   document.getElementById('add-confirm').addEventListener('click', addAccount);
 }
@@ -536,9 +537,21 @@ function onAddUrlInput() {
   }
 }
 
+function toggleAddSection() {
+  const section = document.getElementById('add-section');
+  if (section.style.display === 'none') {
+    section.style.display = '';
+    document.getElementById('add-url').focus();
+  } else {
+    section.style.display = 'none';
+    clearAddForm();
+  }
+}
+
 function clearAddForm() {
   document.getElementById('add-url').value = '';
   document.getElementById('add-preview').style.display = 'none';
+  document.getElementById('add-section').style.display = 'none';
   hideAddError();
 }
 
