@@ -8,8 +8,10 @@ cookies/
 
 # Environment variables
 .env
+keys.txt
 
 # Python
+.venv/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -44,3 +46,4 @@ Thumbs.db
 
 # Logs
 *.log
+scrape_*.log

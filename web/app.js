@@ -57,15 +57,18 @@ function setupEventListeners() {
 // ---- Data Loading ----
 
 async function loadLatestData() {
-  const today = new Date().toISOString().split('T')[0];
-
-  const loaded = await loadData(today);
-  if (!loaded) {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    document.getElementById('date-picker').value = yesterday;
-    state.currentDate = yesterday;
-    await loadData(yesterday);
+  // Try today, then go backward up to 30 days to find the most recent data
+  for (let i = 0; i <= 30; i++) {
+    const date = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
+    const loaded = await loadData(date);
+    if (loaded) {
+      document.getElementById('date-picker').value = date;
+      state.currentDate = date;
+      return;
+    }
   }
+  // No data found in the last 30 days
+  showEmpty();
 }
 
 async function loadData(date) {

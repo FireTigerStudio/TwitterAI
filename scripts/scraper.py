@@ -5,6 +5,7 @@ Cookie-based authentication - no password needed.
 
 import asyncio
 import json
+import os
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
@@ -46,7 +47,8 @@ class TwitterScraper:
     """Main scraper class using Twikit with cookie-based auth"""
 
     def __init__(self):
-        self.client = Client('en-US')
+        proxy = os.environ.get('https_proxy') or os.environ.get('HTTPS_PROXY')
+        self.client = Client('en-US', proxy=proxy)
         self.logger = logger
 
     async def authenticate(self) -> bool:
