@@ -1,28 +1,168 @@
 [
   {
-    "username": "elonmusk",
-    "display_name": "Elon Musk",
-    "category": "tech"
+    "username": "sarahdingwang",
+    "display_name": "Sarah Wang",
+    "category": "uncategorized"
   },
   {
-    "username": "OpenAI",
-    "display_name": "OpenAI",
+    "username": "Jason",
+    "display_name": "@jason",
+    "category": "uncategorized"
+  },
+  {
+    "username": "SCryptowhale",
+    "display_name": "CryptoWhale™",
+    "category": "uncategorized"
+  },
+  {
+    "username": "WuBlockchain",
+    "display_name": "Wu Blockchain",
+    "category": "uncategorized"
+  },
+  {
+    "username": "glassnode",
+    "display_name": "glassnode",
+    "category": "uncategorized"
+  },
+  {
+    "username": "DocumentingBTC",
+    "display_name": "Documenting ₿itcoin 📄",
+    "category": "uncategorized"
+  },
+  {
+    "username": "MacroAlf",
+    "display_name": "Alf",
+    "category": "uncategorized"
+  },
+  {
+    "username": "LizAnnSonders",
+    "display_name": "Liz Ann Sonders",
+    "category": "uncategorized"
+  },
+  {
+    "username": "EconguyRosie",
+    "display_name": "David Rosenberg",
+    "category": "uncategorized"
+  },
+  {
+    "username": "biancoresearch",
+    "display_name": "Jim Bianco",
+    "category": "uncategorized"
+  },
+  {
+    "username": "TheStalwart",
+    "display_name": "Joe Weisenthal",
+    "category": "uncategorized"
+  },
+  {
+    "username": "zerohedge",
+    "display_name": "zerohedge",
+    "category": "uncategorized"
+  },
+  {
+    "username": "unusual_whales",
+    "display_name": "unusual_whales",
+    "category": "uncategorized"
+  },
+  {
+    "username": "Fxhedgers",
+    "display_name": "FXHedge",
+    "category": "uncategorized"
+  },
+  {
+    "username": "DeItaone",
+    "display_name": "*Walter Bloomberg",
+    "category": "uncategorized"
+  },
+  {
+    "username": "IntelDoge",
+    "display_name": "(Not Elon) Doge",
+    "category": "uncategorized"
+  },
+  {
+    "username": "TankerTrackers",
+    "display_name": "TankerTrackers.com, Inc.",
+    "category": "uncategorized"
+  },
+  {
+    "username": "Khamenei_fa",
+    "display_name": "KHAMENEI.IR | فارسی",
+    "category": "uncategorized"
+  },
+  {
+    "username": "IDF",
+    "display_name": "Israel Defense Forces",
+    "category": "uncategorized"
+  },
+  {
+    "username": "CENTCOM",
+    "display_name": "U.S. Central Command",
+    "category": "uncategorized"
+  },
+  {
+    "username": "MengTo",
+    "display_name": "Meng To",
     "category": "ai"
   },
   {
-    "username": "sama",
-    "display_name": "Sam Altman",
+    "username": "egeberkina",
+    "display_name": "Ege",
     "category": "ai"
   },
   {
-    "username": "VitalikButerin",
-    "display_name": "Vitalik Buterin",
-    "category": "web3"
+    "username": "0xROAS",
+    "display_name": "0x ROAS",
+    "category": "uncategorized"
   },
   {
-    "username": "AndrewYNg",
-    "display_name": "Andrew Ng",
+    "username": "AmirMushich",
+    "display_name": "AmirMušić",
     "category": "ai"
+  },
+  {
+    "username": "vasuman",
+    "display_name": "vas",
+    "category": "ai"
+  },
+  {
+    "username": "godofprompt",
+    "display_name": "God of Prompt",
+    "category": "uncategorized"
+  },
+  {
+    "username": "eptwts",
+    "display_name": "EP",
+    "category": "uncategorized"
+  },
+  {
+    "username": "EXM7777",
+    "display_name": "Machina",
+    "category": "uncategorized"
+  },
+  {
+    "username": "marclou",
+    "display_name": "Marc Lou",
+    "category": "uncategorized"
+  },
+  {
+    "username": "jackfriks",
+    "display_name": "jack friks",
+    "category": "uncategorized"
+  },
+  {
+    "username": "CorbinBraun",
+    "display_name": "Corbin Braun",
+    "category": "uncategorized"
+  },
+  {
+    "username": "rileybrown",
+    "display_name": "Riley Brown",
+    "category": "uncategorized"
+  },
+  {
+    "username": "steipete",
+    "display_name": "Peter Steinberger 🦞",
+    "category": "uncategorized"
   },
   {
     "username": "karpathy",
@@ -30,38 +170,53 @@
     "category": "ai"
   },
   {
-    "username": "demishassabis",
-    "display_name": "Demis Hassabis",
+    "username": "easychen",
+    "display_name": "EasyChen",
+    "category": "uncategorized"
+  },
+  {
+    "username": "ajlkn",
+    "display_name": "aj",
+    "category": "uncategorized"
+  },
+  {
+    "username": "levelsio",
+    "display_name": "@levelsio",
+    "category": "uncategorized"
+  },
+  {
+    "username": "AndrewYNg",
+    "display_name": "Andrew Ng",
     "category": "ai"
   },
   {
-    "username": "naval",
-    "display_name": "Naval",
+    "username": "ylecun",
+    "display_name": "Yann LeCun",
+    "category": "uncategorized"
+  },
+  {
+    "username": "ilyasut",
+    "display_name": "Ilya Sutskever",
+    "category": "uncategorized"
+  },
+  {
+    "username": "AlecRad",
+    "display_name": "Alec Radford",
+    "category": "uncategorized"
+  },
+  {
+    "username": "gdb",
+    "display_name": "Greg Brockman",
+    "category": "uncategorized"
+  },
+  {
+    "username": "sama",
+    "display_name": "Sam Altman",
+    "category": "ai"
+  },
+  {
+    "username": "elonmusk",
+    "display_name": "Elon Musk",
     "category": "tech"
-  },
-  {
-    "username": "balajis",
-    "display_name": "Balaji Srinivasan",
-    "category": "web3"
-  },
-  {
-    "username": "MengTo",
-    "display_name": "Mengto",
-    "category": "ai"
-  },
-  {
-    "username": "egeberkina",
-    "display_name": "egeberkina",
-    "category": "ai"
-  },
-  {
-    "username": "AmirMushich",
-    "display_name": "AmirMushich",
-    "category": "ai"
-  },
-  {
-    "username": "vasuman",
-    "display_name": "vasuman",
-    "category": "ai"
   }
 ]
