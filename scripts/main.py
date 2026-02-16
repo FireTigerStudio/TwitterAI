@@ -15,6 +15,7 @@ from utils import setup_logger
 from scraper import TwitterScraper
 from ai_summary import GeminiSummarizer
 from excel_export import ExcelExporter
+from sync_accounts import main as sync_accounts
 
 
 logger = setup_logger(__name__, Config.LOG_LEVEL)
@@ -93,6 +94,7 @@ async def main():
     """Main pipeline execution"""
     parser = argparse.ArgumentParser(description="TwitterAI pipeline")
     parser.add_argument("--date", help="Date (YYYY-MM-DD), defaults to today", default=None)
+    parser.add_argument("--sync", action="store_true", help="Sync accounts.json with Twitter following list before scraping")
     args = parser.parse_args()
 
     if args.date:
@@ -106,6 +108,12 @@ async def main():
     logger.info(f"Starting TwitterAI pipeline for {date_str}")
 
     Config.ensure_directories()
+
+    if args.sync:
+        logger.info("Syncing accounts.json with Twitter following list...")
+        sync_result = await sync_accounts()
+        if sync_result != 0:
+            logger.warning("Account sync failed, continuing with existing accounts.json")
 
     try:
         json_path = await run_scraper()

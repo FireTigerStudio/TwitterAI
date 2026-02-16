@@ -73,8 +73,8 @@ class TwitterScraper:
 
             # Validate cookies by making a test request
             try:
-                me = await self.client.user()
-                self.logger.info(f"Authenticated as @{me.screen_name}")
+                me = await self.client.get_user_by_screen_name('elonmusk')
+                self.logger.info(f"Authenticated successfully (test fetch: @{me.screen_name})")
                 return True
             except Exception as e:
                 self.logger.error(
